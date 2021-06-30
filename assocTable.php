@@ -5,6 +5,7 @@
  * Date: 6/29/2021
  * Time: 6:22 PM
  */
+
 $data[0] = array(
     "gallery_id" => 4,
     "gallery_title" => "Title",
@@ -18,35 +19,44 @@ $data[1] = array(
 
 class assocTable
 {
-    public static function table($fields, $labels = array(), $links)
+    public static function table($fields, $items = array(), $links)
     {
-        if ($labels == array()) {
-            $keyOfArray = array_keys($fields[0]);
-            foreach ($keyOfArray as $key => $value) {
-                $labels[$value] = ucfirst(str_replace("_", " ", $value));
+        $keyOfArray = array_keys($fields[0]);
+        foreach ($keyOfArray as $key => $value) {
+            if(array_key_exists($value, $items['header']) && array_key_exists("label", $items['header'][$value])) {
+                $items['header'][$value]['label'] = $items['header'][$value]['label'];
             }
+            else
+                $items['header'][$value]['label'] = ucfirst(str_replace("_", " ", $value));
+
         }
+//        var_dump($labels['header']);
+//        var_dump($keyOfArray);
+//        die;
         echo "<table class='table table-bordered'>";
         echo "<thead class='bg-white'>";
         echo "<tr>";
 
-        foreach ($labels as $key => $value) {
-            echo "<th>" . $value . "</th>";
+        foreach ($items['header'] as $key => $value) {
+            echo "<th>" .  $value['label'] . "</th>";
         }
         echo "<th> Actions </th>";
         echo "</tr>";
         echo "<tbody>";
         foreach ($fields as $columns) {
             echo "<tr>";
-            foreach ($labels as $key => $value) {
-                echo "<td>" . $columns[$key] . "</td>";
+            foreach ($items['header'] as $key => $value) {
+                echo "<td ";
+                echo array_key_exists('options', $value) ? $value['options'] : "";
+                echo ">";
+                echo $columns[$key] . "</td>";
             }
             echo "<td>";
-            foreach ($links as $link) {
+            foreach ($items['actions'] as $key => $value) {
                 echo "
-<a href='". $link['url'] .$columns[array_keys($labels)[0]]."'> " . $link['template'] . "</a>";
+<a href='" . $value['url'] . "?" .  $items['priamryKey'] . "=" .  $columns[$items['priamryKey']]  . "'> <i class='fa fa-trash'></i> </a>";
             }
-            echo  "</td>";
+            echo "</td>";
             echo "</tr>";
         }
     }
@@ -63,27 +73,35 @@ class assocTable
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <link rel="stylesheet" href="bootstrap.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+          integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
 </head>
 <body>
 <div class="container p-5">
     <div class="row">
         <?php
-        //            $labels = ['gallery_id' => "Id", "gallery_title" => "Title Of Picture", "gallery_image" => "Image"];
-        $links =
-            [
-                'delete' =>
-                    [
-                        'template' => "<i class='fa fa-trash'></i>",
-                        'url' => "delete.php?id="
+        $items = [
+            'priamryKey' => 'gallery_id',
+            'header' =>
+                [
+                    'gallery_id' => [
+                        "options" => "onclick=\"alert('hello')\""
                     ],
-                'update' =>
-                    [
-                        'template' => "<i class='fa fa-pen'></i>",
-                        'url' => "update.php?id="
+                    'gallery_title' => [
+                        'label' => "Title"
                     ]
-            ];
-        assocTable::table($data,array(), $links);
+                ],
+            'actions' => [
+                'delete' => [
+                    'url' => "delete.php"
+                ],
+                'update' => [
+                    'url' => 'edit.php'
+                ]
+            ]
+        ];
+        assocTable::table($data, $items, array());
         ?>
     </div>
 </div>
