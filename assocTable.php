@@ -49,7 +49,13 @@ class assocTable
                 echo "<td ";
                 echo array_key_exists('options', $value) ? $value['options'] : "";
                 echo ">";
-                echo $columns[$key] . "</td>";
+                if(array_key_exists("type", $value)) {
+                    if($value['type'] == "image") {
+                        echo "<img src='" . $columns[$key] . "'/>";
+                    }
+                }
+                else  echo $columns[$key] ;
+                echo "</td>";
             }
             echo "<td>";
             foreach ($items['actions'] as $key => $value) {
@@ -81,6 +87,18 @@ class assocTable
 <div class="container p-5">
     <div class="row">
         <?php
+        // You can added a below properties for your columns :
+        /*
+         * options
+         * label
+         * type
+         * */
+        /*
+         * Primary Key For Show Id in Actions!
+         * */
+        /*
+         * Actions must be have url!
+         * */
         $items = [
             'priamryKey' => 'gallery_id',
             'header' =>
@@ -90,6 +108,9 @@ class assocTable
                     ],
                     'gallery_title' => [
                         'label' => "Title"
+                    ],
+                    'gallery_image' => [
+                        'type' => 'image',
                     ]
                 ],
             'actions' => [
